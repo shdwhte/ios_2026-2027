@@ -14,6 +14,7 @@ iOS-застосунок для керування особистими завд
 3. Позначити завдання виконаним.
 4. Відфільтрувати завдання за статусом.
 5. Дізнатися найближчий дедлайн.
+6. Очистити список від виконаних завдань.
 
 ## Предметна область (сутності)
 - `TaskItem`: окреме завдання.
@@ -30,9 +31,9 @@ iOS-застосунок для керування особистими завд
 | властивості, методи, init | `TaskItem`, `TaskList` |
 | колекція | `TaskList.tasks: [TaskItem]` |
 | optional | `TaskItem.dueDate: Date?`, `nearestDeadline() -> Date?` |
-| безпечне розгортання | `guard let` у `complete(title:)`, `if let` у `runScenario()` |
-| умовна конструкція | `if / else` у `runScenario()` |
-| обробка колекції | `for`, `filter`, `compactMap`, `forEach` (`Models.swift`, `Scenario.swift`) |
+| безпечне розгортання | `guard let` у `complete(title:)`, `if let` у `runScenario()` та `formattedDate` |
+| умовна конструкція | `if / else` у `runScenario()` та `formattedDate` |
+| обробка колекції | `for`, `filter`, `compactMap`, `forEach`, `removeAll(where:)` (`Models.swift`, `Scenario.swift`) |
 
 ## Як перевірити сценарій
 1. Відкрити `TaskTracker.xcodeproj` у Xcode.
@@ -44,3 +45,6 @@ iOS-застосунок для керування особистими завд
 - Назва: TaskTracker
 - Bundle Identifier: `com.<прізвище>.TaskTracker`
 - Мінімальна версія iOS: 17.0
+
+## Результат роботи
+![Скріншот програми](result.jpg)

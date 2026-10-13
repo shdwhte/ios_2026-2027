@@ -31,7 +31,9 @@ func runScenario() -> [String] {
 
     // 4. optional: if let, optional chaining, ??
     if let deadline = list.nearestDeadline() {
-        log.append("Найближчий дедлайн: \(deadline)")
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yyyy HH:mm"
+        log.append("Найближчий дедлайн: \(formatter.string(from: deadline))")
     } else {
         log.append("Дедлайнів немає")
     }
@@ -47,6 +49,11 @@ func runScenario() -> [String] {
     let sameList = list
     sameList.add(TaskItem(title: "Додано через іншу змінну"))
     log.append("class: list.tasks.count = \(list.tasks.count) (sameList вказує на той самий об'єкт)")
+
+    // 6. обробка колекції (видалення виконаних) та використання відформатованої дати
+    let removedCount = list.removeCompleted()
+    log.append("Очищено виконаних завдань: \(removedCount)")
+    log.append("Актуальна кількість завдань після очищення: \(list.tasks.count)")
 
     return log
 }

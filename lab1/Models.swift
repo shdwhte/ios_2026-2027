@@ -30,8 +30,19 @@ struct TaskItem: Describable {
         self.dueDate = dueDate
     }
 
+    // безпечне розгортання optional через if let та умовна конструкція
+    var formattedDate: String {
+        if let date = dueDate {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "dd.MM.yyyy HH:mm"
+            return formatter.string(from: date)
+        } else {
+            return "немає"
+        }
+    }
+
     var summary: String {
-        "[\(status)] \(title), пріоритет: \(priority.rawValue)"
+        "[\(status)] \(title), пріоритет: \(priority.rawValue), дедлайн: \(formattedDate)"
     }
 
     mutating func markDone() {
@@ -71,5 +82,12 @@ final class TaskList: Describable {
 
     func nearestDeadline() -> Date? {
         tasks.compactMap { $0.dueDate }.min()
+    }
+    
+    // обробка елементів колекції: видалення за умовою
+    func removeCompleted() -> Int {
+        let initialCount = tasks.count
+        tasks.removeAll(where: { $0.status == .done })
+        return initialCount - tasks.count
     }
 }
