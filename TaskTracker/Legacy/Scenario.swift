@@ -1,81 +1,5 @@
 import Foundation
 
-// enum: скінченний набір варіантів
-enum Priority: String, CaseIterable {
-    case low, medium, high
-}
-
-enum TaskStatus {
-    case todo, inProgress, done
-}
-
-// protocol: набір вимог до типу
-protocol Describable {
-    var summary: String { get }
-}
-
-// struct: семантика значення (копіюється при присвоєнні)
-struct TaskItem: Describable {
-    let id: UUID                 // let: константа
-    var title: String            // var: змінна
-    var priority: Priority
-    var status: TaskStatus
-    var dueDate: Date?           // optional: дедлайну може не бути
-
-    init(title: String, priority: Priority = .medium, dueDate: Date? = nil) {
-        self.id = UUID()
-        self.title = title
-        self.priority = priority
-        self.status = .todo
-        self.dueDate = dueDate
-    }
-
-    var summary: String {
-        "[\(status)] \(title), пріоритет: \(priority.rawValue)"
-    }
-
-    mutating func markDone() {
-        status = .done
-    }
-}
-
-// class: семантика посилання (дві змінні можуть вказувати на один об'єкт)
-final class TaskList: Describable {
-    let name: String
-    private(set) var tasks: [TaskItem] = []   // колекція
-
-    init(name: String) {
-        self.name = name
-    }
-
-    var summary: String {
-        "\(name): \(tasks.count) завдань"
-    }
-
-    func add(_ task: TaskItem) {
-        tasks.append(task)
-    }
-
-    func tasks(with status: TaskStatus) -> [TaskItem] {
-        tasks.filter { $0.status == status }
-    }
-
-    func complete(title: String) -> Bool {
-        // безпечне розгортання optional через guard let
-        guard let index = tasks.firstIndex(where: { $0.title == title }) else {
-            return false
-        }
-        tasks[index].markDone()
-        return true
-    }
-
-    func nearestDeadline() -> Date? {
-        tasks.compactMap { $0.dueDate }.min()
-    }
-}
-
-import Foundation
-
 /// Завершений сценарій: створення, додавання, зміна стану, фільтрація.
 func runScenario() -> [String] {
     var log: [String] = []
@@ -107,7 +31,9 @@ func runScenario() -> [String] {
 
     // 4. optional: if let, optional chaining, ??
     if let deadline = list.nearestDeadline() {
-        log.append("Найближчий дедлайн: \(deadline)")
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yyyy HH:mm"
+        log.append("Найближчий дедлайн: \(formatter.string(from: deadline))")
     } else {
         log.append("Дедлайнів немає")
     }
@@ -124,7 +50,10 @@ func runScenario() -> [String] {
     sameList.add(TaskItem(title: "Додано через іншу змінну"))
     log.append("class: list.tasks.count = \(list.tasks.count) (sameList вказує на той самий об'єкт)")
 
+    // 6. обробка колекції (видалення виконаних) та використання відформатованої дати
+    let removedCount = list.removeCompleted()
+    log.append("Очищено виконаних завдань: \(removedCount)")
+    log.append("Актуальна кількість завдань після очищення: \(list.tasks.count)")
+
     return log
 }
-
-runScenario().forEach { print($0) }
