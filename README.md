@@ -158,4 +158,16 @@ let sut = TaskListInteractor(repository: MockTaskRepository(),
 Interactor створюється з `MockTaskRepository` і `MockAIAssistant`, а Presenter у тесті замінюється `OutputSpy`. Жодного SwiftUI та реального сховища для цього не потрібно (див. `TaskListInteractorTests`).
    
 ## Результат роботи
-![Скріншот програми](pic/result.jpg)
+Застосунок успішно переведено на архітектуру VIPER та інтегровано з повністю функціональним інтерфейсом на SwiftUI. 
+
+**Практична реалізація UI та інтеграції:**
+* **Ізоляція UI:** Екрани (`TaskListView`, `AddTaskView`) не містять жодної бізнес-логіки чи прямого доступу до `TaskItem`. Вони є абсолютно пасивними: лише відображають підготовлені дані (`TaskRowViewModel`) та передають події натискання кнопок у `TaskListPresenter`.
+* **Чистота імпортів (захист від антипатернів):** Для забезпечення реактивності (`@Published`, `ObservableObject`) у шарі презентації (`TaskListPresenter`) використано фреймворк `Combine`. Відмова від `import SwiftUI` у файлах логіки на рівні компілятора гарантує неможливість змішування бізнес-правил із візуальними компонентами.
+* **Інтеграція модулів:** У головній точці входу (`TaskTrackerApp`) застосовано породжувальний патерн через виклик `TaskModuleBuilder().build()`. Це ідеально інкапсулює збірку VIPER-модуля та реалізує Dependency Injection.
+
+**Скриншоти готового застосунку:**
+![Головний екран списку завдань](pic/MainPage.jpg)
+![Екран додавання](pic/AddPage.jpg)
+![ШІ-асистент](pic/AIPage.jpg)
+![видалення](pic/DeleteView.jpg)
+![Сортування списку задач](pic/SortingView.jpg)

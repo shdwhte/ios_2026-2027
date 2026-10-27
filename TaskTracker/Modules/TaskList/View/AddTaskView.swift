@@ -1,35 +1,45 @@
 import SwiftUI
 
 struct AddTaskView: View {
-    let onSave: (String, Priority, Date?) -> Void
-    let onCancel: () -> Void
-
-    @State private var title = ""
+    @State private var title: String = ""
     @State private var priority: Priority = .medium
-    @State private var hasDueDate = false
-    @State private var dueDate = Date()
-
+    @State private var hasDeadline: Bool = false
+    @State private var dueDate: Date = Date()
+    
+    var onSave: (String, Priority, Date?) -> Void
+    var onCancel: () -> Void
+    
     var body: some View {
         NavigationStack {
             Form {
-                TextField("Назва", text: $title)
-                Picker("Пріоритет", selection: $priority) {
-                    ForEach([Priority.low, .medium, .high], id: \.self) {
-                        Text($0.displayName).tag($0)
+                Section(header: Text("Основна інформація")) {
+                    TextField("Назва завдання", text: $title)
+                    
+                    Picker("Пріоритет", selection: $priority) {
+                        Text("Низький").tag(Priority.low)
+                        Text("Середній").tag(Priority.medium)
+                        Text("Високий").tag(Priority.high)
                     }
                 }
-                Toggle("Є дедлайн", isOn: $hasDueDate)
-                if hasDueDate {
-                    DatePicker("Дедлайн", selection: $dueDate)
+                
+                Section(header: Text("Час")) {
+                    Toggle("Встановити дедлайн", isOn: $hasDeadline)
+                    if hasDeadline {
+                        DatePicker("Дата та час", selection: $dueDate, displayedComponents: [.date, .hourAndMinute])
+                    }
                 }
             }
             .navigationTitle("Нове завдання")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
+                ToolbarItem(placement: .navigationBarLeading) {
                     Button("Скасувати", action: onCancel)
                 }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Додати") { onSave(title, priority, hasDueDate ? dueDate : nil) }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Зберегти") {
+                        onSave(title, priority, hasDeadline ? dueDate : nil)
+                    }
+                    .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }
         }
